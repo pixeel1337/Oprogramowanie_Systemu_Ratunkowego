@@ -3,6 +3,12 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 .kotlin
+*.class
+build/
+.idea/
+*.iml
+Thumbs.db
+
 
 ### Eclipse ###
 .apt_generated
