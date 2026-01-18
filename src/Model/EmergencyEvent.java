@@ -21,6 +21,7 @@ public class EmergencyEvent implements IEvent {
         this.priority = priority;
     }
 
+    @Override
     public void addVictim(IPatient victim) {
         this.victims.add(victim);
     }

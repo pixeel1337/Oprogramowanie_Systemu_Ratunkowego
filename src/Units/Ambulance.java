@@ -2,20 +2,29 @@ package Units;
 
 import Enums.ServiceType;
 import Interfaces.IEmergencyUnit;
+import Interfaces.IHospital;
 import Interfaces.IPatient;
 import Interfaces.ITicket;
 import java.util.List;
 
 public class Ambulance implements IEmergencyUnit {
     private String id;
-    private boolean available = true;
+    private boolean available;
     private ITicket currentTicket;
     private IPatient currentPatient;
+    private ServiceType serviceType;
+    private List<IHospital> knownHospitals;
+
 
     public Ambulance(String id) {
         this.id = id;
+        this.serviceType = ServiceType.MEDICAL;
+        this.available = true;
     }
 
+    public void setHospitals(List<IHospital> hospitals) {
+        this.knownHospitals = hospitals;
+    }
 
     @Override
     public String getID() {
@@ -48,21 +57,34 @@ public class Ambulance implements IEmergencyUnit {
         if (currentPatient == null) {
             List<IPatient> victims = currentTicket.getEvent().getVictims();
             for(IPatient p : victims) {
-                if(p.patientLocation().equals("Miejsce zdarzenia")) {
+                if(p.patientLocation() != null && p.patientLocation().equals("Miejsce zdarzenia")) {
                     currentPatient = p;
+                    p.setLocation("W karetce " + this.id);
                     break;
                 }
             }
         }
 
-        if(currentPatient != null) {
-            System.out.println("Jednostka " + id + "zabiera pacjenta: " + currentPatient.getFirstName());
+        if (currentPatient != null) {
+            System.out.println("Jednostka " + id + " zabiera pacjenta: " + currentPatient.getFirstName() + "\n");
 
-            currentPatient.setLocation("W transporcie");
+            if(knownHospitals != null) {
+                for(IHospital h: knownHospitals) {
+                    if(h.getAvailableBeds() > 0){
+                        boolean success = h.admitPatient(currentPatient);
+                        if(success) {
+                            System.out.println(" -> SUKCES: Pacjent przekazany do: " + h.getName() + "\n");
+                            currentTicket.addHelpedVictims();
+                            currentPatient = null;
+                            return;
+                        }
+                    }
+                }
+                System.out.println(" -> OSTRZEŻENIE: Brak miejsc w szpitalach!\n");
+            } else {
+                System.out.println(" -> BŁĄD: Karetka nie zna szpitali!\n");
+            }
 
-            currentTicket.addHelpedVictims();
-
-            currentPatient = null;
         }
     }
 

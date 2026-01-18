@@ -7,22 +7,19 @@ public class Patient implements IPatient {
     private String firstName;
     private String lastName;
     private String pesel;
-    private String dateOfBirth;
     private int turnsToRecover = -1;
     private String Location;
 
-    public Patient(String firstName, String lastName, String pesel, String dateOfBirth, int turnsToRecover) {
+    public Patient(String firstName, String lastName, String pesel, int turnsToRecover) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.pesel = pesel;
-        this.dateOfBirth = dateOfBirth;
         this.turnsToRecover = turnsToRecover;
-        this.Location = "Miejsce Zdarzenia";
+        this.Location = "Miejsce zdarzenia";
     }
 
     @Override
     public void startTreatment() {
-        this.turnsToRecover = 2;
         this.Location = "Szpital";
     }
 

@@ -7,6 +7,7 @@ import Interfaces.IEmergencyUnit;
 import Interfaces.ITicket;
 import Interfaces.IDispatcher;
 import Model.Ticket;
+import Units.Ambulance;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ public class EmergencyDispatcher implements IDispatcher{
     @Override
     public void addUnit(IEmergencyUnit unit){
         this.allUnits.add(unit);
+        if (unit instanceof Ambulance){
+            ((Ambulance) unit).setHospitals((this.hospitals));
+        }
     }
 
     @Override
@@ -48,14 +52,15 @@ public class EmergencyDispatcher implements IDispatcher{
 
     @Override
     public void dispatchUnits(List<IEmergencyUnit> units) {
-        for(ITicket ticket: activeTickets){
+        for (ITicket ticket : activeTickets) {
             Map<ServiceType, Integer> requirements = ticket.getEvent().getRequiredUnits();
 
-            for(ServiceType type: requirements.keySet()){
+            for (ServiceType type : requirements.keySet()) {
                 int needed = requirements.get(type);
                 int found = 0;
-                for(IEmergencyUnit unit: allUnits){
-                    if(found < needed && unit.isAvailable() && unit.getServiceType() == type) {
+
+                for (IEmergencyUnit unit : units) {
+                    if (found < needed && unit.isAvailable() && unit.getServiceType() == type) {
                         unit.assignToTicket(ticket);
                         found++;
                     }
@@ -68,7 +73,7 @@ public class EmergencyDispatcher implements IDispatcher{
     public void sendReport() {
         System.out.println("============RAPORT DYSPOZYTORA============");
         System.out.println("===========================================");
-        System.out.println("Aktywne zdarzenia: " +activeTickets.size());
+        System.out.println("Aktywne zdarzenia: " + activeTickets.size());
 
         int busyTickets = 0;
         for (IEmergencyUnit unit: allUnits){
@@ -76,10 +81,10 @@ public class EmergencyDispatcher implements IDispatcher{
                 busyTickets++;
             }
         }
-        System.out.println("Jednostki aktualnie w akcji: "+ busyTickets);
+        System.out.println("Jednostki aktualnie w akcji: " + busyTickets);
 
         for(IHospital hospital: hospitals) {
-            System.out.println("Szpital " + hospital.getName() + ". " + "Wolne lozka: " + hospital.getAvailableBeds());
+            System.out.println("Szpital: " + hospital.getName() + ". " + "Wolne lozka: " + hospital.getAvailableBeds());
         }
         System.out.println("===========================================");
     }
@@ -99,7 +104,7 @@ public class EmergencyDispatcher implements IDispatcher{
                 ticket.processTurn();
 
                 if(ticket.isFinished()) {
-                    System.out.println("Zgloszenie " + ticket.getEvent().getEventName() + "zostalo zakonczone");
+                    System.out.println("Zgloszenie " + ticket.getEvent().getEventName() + " zostalo zakonczone\n");
                     for(IEmergencyUnit unit: allUnits){
                         unit.releaseTicket();
                     }

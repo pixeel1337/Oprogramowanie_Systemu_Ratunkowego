@@ -9,6 +9,8 @@ import java.util.Map;
 public interface IEvent {
     String getEventName();
 
+    void addVictim(IPatient victim);
+
     Map<ServiceType, Integer> getRequiredUnits();
 
     List<IPatient> getVictims();

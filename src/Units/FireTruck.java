@@ -6,11 +6,14 @@ import Interfaces.ITicket;
 
 public class FireTruck implements IEmergencyUnit {
     private String id;
-    private boolean available = true;
+    private boolean available;
     private ITicket currentTicket = null;
+    private ServiceType serviceType;
 
     public FireTruck(String id) {
         this.id = id;
+        this.serviceType = ServiceType.FIRE;
+        this.available = true;
     }
 
 
@@ -39,7 +42,8 @@ public class FireTruck implements IEmergencyUnit {
     @Override
     public void performAction() {
         if(this.currentTicket != null) {
-            System.out.println("Jednostka " + id + "akutalnie usuwa skutki zdarzenia/gasi pozar");
+            System.out.println("Jednostka " + id + "akutalnie usuwa skutki zdarzenia/gasi pozar\n");
+            this.available = false;
         }
     }
 

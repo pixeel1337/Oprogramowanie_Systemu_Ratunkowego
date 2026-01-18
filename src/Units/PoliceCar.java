@@ -6,11 +6,15 @@ import Interfaces.ITicket;
 
 public class PoliceCar implements IEmergencyUnit {
     private String id;
-    private boolean available = true;
+    private boolean available;
     private ITicket currentTicket = null;
+    private ServiceType serviceType;
+
 
     public PoliceCar(String id) {
         this.id = id;
+        this.serviceType = ServiceType.POLICE;
+        this.available = true;
     }
 
     @Override
@@ -37,7 +41,8 @@ public class PoliceCar implements IEmergencyUnit {
     @Override
     public void performAction() {
         if(currentTicket != null) {
-            System.out.println("Patrol " + id + "akutalnie zabezpiecza teren zdarzenia");
+            System.out.println("Patrol " + id + " akutalnie zabezpiecza teren zdarzenia\n");
+            this.available = false;
         }
     }
 
