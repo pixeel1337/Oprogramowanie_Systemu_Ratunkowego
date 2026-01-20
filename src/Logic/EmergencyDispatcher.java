@@ -89,6 +89,10 @@ public class EmergencyDispatcher implements IDispatcher{
         System.out.println("===========================================");
     }
 
+    @Override
+    public String toString() {
+        return this.name.toUpperCase();
+    }
 
     @Override
     public void updateTurns() {

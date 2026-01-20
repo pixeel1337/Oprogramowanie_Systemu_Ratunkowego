@@ -1,68 +1,67 @@
 import Enums.ServiceType;
-import Interfaces.IDispatcher;
-import Interfaces.IEmergencyUnit;
 import Interfaces.IEvent;
-import Interfaces.IHospital;
-import Interfaces.IPatient;
-import Interfaces.ITicket;
-
-import Units.Ambulance;
-import Units.FireTruck;
-import Units.PoliceCar;
-
+import Logic.EmergencyDispatcher;
 import Model.CityHospital;
 import Model.EmergencyEvent;
 import Model.Patient;
-import Model.Ticket;
-import Logic.EmergencyDispatcher;
+import Units.Ambulance;
+import Units.PoliceCar;
+import Units.FireTruck;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        EmergencyDispatcher dispatcher = new EmergencyDispatcher("First Dispatcher");
+        EmergencyDispatcher dispatcherNorth = new EmergencyDispatcher("REJON PÓŁNOC");
+        dispatcherNorth.addHospital(new CityHospital("Szpital Północny", 10));
+        dispatcherNorth.addUnit(new Ambulance("Karetka-P1"));
+        dispatcherNorth.addUnit(new PoliceCar("Policja-P1"));
 
-        dispatcher.addHospital(new CityHospital("Szpital wojewodzki", 10));
+        EmergencyDispatcher dispatcherSouth = new EmergencyDispatcher("REJON POŁUDNIE");
+        dispatcherSouth.addHospital(new CityHospital("Przychodnia Mała", 1));
+        dispatcherSouth.addHospital(new CityHospital("Klinika Południowa", 2));
 
-        Ambulance firstAmbulance = new Ambulance("First Ambulance");
-        Ambulance secondAmbulance = new Ambulance("Second Ambulance");
-        Ambulance thirdAmbulance = new Ambulance("Third Ambulance");
+        dispatcherSouth.addUnit(new Ambulance("Karetka-S1"));
+        dispatcherSouth.addUnit(new Ambulance("Karetka-S2"));
+        dispatcherSouth.addUnit(new Ambulance("Karetka-S3"));
+        dispatcherSouth.addUnit(new Ambulance("Karetka-S4"));
+        dispatcherSouth.addUnit(new PoliceCar("Policja-S1"));
 
-        PoliceCar firstPoliceCar = new PoliceCar("First Police");
-        PoliceCar secondPoliceCar = new PoliceCar("Second Police");
+        System.out.println("========== INICJALIZACJA SYSTEMU DWÓCH REJONÓW ==========");
 
-        FireTruck firstFireTruck = new FireTruck("First Fire Truck");
-        FireTruck secondFireTruck = new FireTruck("Second Fire Truck");
+        Map<ServiceType, Integer> needsNorth = new HashMap<>();
+        needsNorth.put(ServiceType.MEDICAL, 1);
+        IEvent eventNorth = new EmergencyEvent("Stłuczka Północ", needsNorth, 3);
+        eventNorth.addVictim(new Patient("Marek", "Z", "1", 2));
+        dispatcherNorth.receiveEvent(eventNorth, 3);
 
-        dispatcher.addUnit(firstAmbulance);
-        dispatcher.addUnit(secondAmbulance);
-        dispatcher.addUnit(thirdAmbulance);
+        Map<ServiceType, Integer> needsSouth = new HashMap<>();
+        needsSouth.put(ServiceType.MEDICAL, 4);
+        needsSouth.put(ServiceType.POLICE, 1);
+        IEvent disasterSouth = new EmergencyEvent("Wielki Karambol Południe", needsSouth, 10);
+        disasterSouth.addVictim(new Patient("Pacjent", "1", "P1", 4));
+        disasterSouth.addVictim(new Patient("Pacjent", "2", "P2", 4));
+        disasterSouth.addVictim(new Patient("Pacjent", "3", "P3", 4));
+        disasterSouth.addVictim(new Patient("Pacjent", "4", "P4", 4));
+        dispatcherSouth.receiveEvent(disasterSouth, 10);
 
-        dispatcher.addUnit(firstPoliceCar);
-        dispatcher.addUnit(secondPoliceCar);
+        for (int t = 0; t < 10; t++) {
+            System.out.println("\n" + "=".repeat(60));
+            System.out.println("          SYMULACJA - TURA NR " + t);
+            System.out.println("=".repeat(60));
 
-        dispatcher.addUnit(firstFireTruck);
-        dispatcher.addUnit(secondFireTruck);
+            System.out.println("\n--- " + dispatcherNorth + " ---");
+            dispatcherNorth.updateTurns();
+            dispatcherNorth.sendReport();
 
+            System.out.println("\n" + ".".repeat(40));
 
-        Map<ServiceType, Integer> requiredServices = new HashMap<ServiceType, Integer>();
-        requiredServices.put(ServiceType.MEDICAL, 2);
-        requiredServices.put(ServiceType.POLICE, 4);
-
-        IEvent accident = new EmergencyEvent("Karambol na S7", requiredServices, 5);
-        accident.addVictim(new Patient("Jan", "Kowalski", "0000000", 3));
-        accident.addVictim(new Patient("Maria", "Kowalska", "0000000", 2));
-
-        dispatcher.receiveEvent(accident, 5);
-
-        for(int i = 0; i < 8; i++) {
-            System.out.println("\n-----TURA NR " + i + "-----");
-            dispatcher.updateTurns();
-            dispatcher.sendReport();
-
-
+            System.out.println("\n--- " + dispatcherSouth + " ---");
+            dispatcherSouth.updateTurns();
+            dispatcherSouth.sendReport();
         }
+
+        System.out.println("\n========== KONIEC TESTU ==========");
     }
 }
-
